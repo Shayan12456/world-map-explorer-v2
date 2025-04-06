@@ -97,7 +97,6 @@ header button{
     position: relative;
     width: 100%;
     min-width: 200px;
-
     height: 30px;
 }
 #c-search-input input {
@@ -461,4 +460,37 @@ footer {
   align-items: right;
   float: right;
   margin-left: 10px;
+}
+
+.box-input span i {
+  font-size: 18px;
+  margin-right: 10px;
+  color: #6F0E0E;
+}
+
+.dist-input {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+
+.dist-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  background-color: transparent;
+}
+
+.dist-input button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #777;
+  margin-left: 5px;
 }

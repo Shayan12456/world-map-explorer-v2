@@ -88,40 +88,47 @@
 
   <!-- Box that appears on icon click -->
   <div class="box" id="box" tabindex="0" aria-label="distance finder opened">
-    <button class="fas fa-times-circle" id="closeBtn" aria-label="close distance finder" tabindex="0"
+    <button class="fas fa-times-circle close-btn" id="closeBtn" aria-label="close distance finder"
       onclick="notifySreenReader(`distance finder closed`)"></button>
-    <h1>Find Distance</h1>
-
+  
+    <h1 class="distance-title">
+      <i class="fas fa-route"></i> Find Distance
+    </h1>
+  
+    <p class="distance-subtext">Measure the road distance and time between two locations.</p>
+  
     <div class="box-input">
-      <span><i class="fas fa-circle"></i></span>
-      <div class="dist-input" id="c-beginning"><input type="text" tabindex="0" id="beginning"
-          placeholder="Enter Starting point" aria-label="type place and press enter" />
-        <button tabindex="0" aria-label="click to see suggessions" id="b-searchbutton"><i
-            class="fa fa-search"></i></button>
+      <label for="beginning"><i class="fas fa-circle icon-start"></i></label>
+      <div class="dist-input" id="c-beginning">
+        <input type="text" id="beginning" placeholder="Enter Starting point"
+          aria-label="Type starting place and press enter" />
+        <button aria-label="Search starting location" id="b-searchbutton"><i class="fa fa-search"></i></button>
       </div>
     </div>
-
-
+  
     <div class="box-input">
-      <span><i class="fas fa-map-marker-alt"></i></span>
-      <div class="dist-input" id="c-destination"><input tabindex="0" type="text" id="destination"
-          placeholder="Enter Destination" aria-label="type place and press enter" />
-        <button id="d-searchbutton" tabindex="0" aria-label="click to see suggessions"><i
-            class="fa fa-search"></i></button>
+      <label for="destination"><i class="fas fa-map-marker-alt icon-end"></i></label>
+      <div class="dist-input" id="c-destination">
+        <input type="text" id="destination" placeholder="Enter Destination"
+          aria-label="Type destination and press enter" />
+        <button aria-label="Search destination location" id="d-searchbutton"><i class="fa fa-search"></i></button>
       </div>
     </div>
-
-    <button class="fas fa-map-marked-alt" aria-hidden="true" title="Choose from map" id="fromMap"
-      tabindex="-1"></button>
-    <button class="fas fa-arrow-circle-right" tabindex="0" id="find" title="Find Distance"
-      aria-label=" click to Find distance"></button>
+  
+    <div class="button-row">
+      <button class="fas fa-map-marked-alt" title="Choose from map" id="fromMap" aria-label="Choose from map"></button>
+      <button class="fas fa-route find-btn" id="find" title="Find Distance" aria-label="Click to find distance"></button>
+    </div>
+  
     <div tabindex="0" id="distanceResult" aria-live="polite">
-      Distance : <span id="dist"></span><br />
-      Time : <span id="time"></span>
+      <strong>Distance:</strong> <span id="dist"></span><br />
+      <strong>Estimated Time:</strong> <span id="time"></span>
     </div>
-    <p style="font-size: 10px;" class="text-center"><br>Directions courtesy of <a
-        href="https://gis-ops.com/global-open-valhalla-server-online/" target="_blank">Valhalla (FOSSGIS)</a></p>
+  
+    <p class="source-credit">Directions courtesy of <a href="https://gis-ops.com/global-open-valhalla-server-online/"
+        target="_blank">Valhalla (FOSSGIS)</a></p>
   </div>
+  
 
   <div tabindex="0" aria-label="focused on map. use arrow keys to navigate" id="map"></div>
 
