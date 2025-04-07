@@ -85,7 +85,7 @@
       <span id="lng"></span>
     </span>
   </div>
-
+  <br>
   <!-- Box that appears on icon click -->
   <div class="box" id="box" tabindex="0" aria-label="distance finder opened">
     <button class="fas fa-times-circle close-btn" id="closeBtn" aria-label="close distance finder"
@@ -117,12 +117,17 @@
   
     <div class="button-row">
       <button class="fas fa-map-marked-alt" title="Choose from map" id="fromMap" aria-label="Choose from map"></button>
-      <button class="fas fa-route find-btn" id="find" title="Find Distance" aria-label="Click to find distance"></button>
+      <button class="find-btn" id="find" title="Find Distance" aria-label="Click to find distance">
+         <i class="fas fa-route"></i>
+      </button>
     </div>
   
     <div tabindex="0" id="distanceResult" aria-live="polite">
       <strong>Distance:</strong> <span id="dist"></span><br />
       <strong>Estimated Time:</strong> <span id="time"></span>
+      <button id="copy-route-link-btn" style="display: none; margin-left: 10px; padding: 5px 8px; font-size: 12px; cursor: pointer;">
+        <i class="fas fa-link"></i> Copy Route Link
+      </button>
     </div>
   
     <p class="source-credit">Directions courtesy of <a href="https://gis-ops.com/global-open-valhalla-server-online/"

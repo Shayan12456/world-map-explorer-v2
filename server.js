@@ -21,7 +21,7 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = '.' + req.url;
+  let filePath = '.' + req.url.split('?')[0];  // ✅ Strip query string
   if (filePath == './') filePath = './public/index.html';  // Default to index.html
 
   const extname = String(path.extname(filePath)).toLowerCase();
