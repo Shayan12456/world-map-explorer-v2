@@ -21,7 +21,7 @@ const mimeTypes = {
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = '.' + req.url.split('?')[0];  // ✅ Strip query string
+  let filePath = '.' + req.url.split('?')[0];  // Strip query string
   if (filePath == './') filePath = './public/index.html';  // Default to index.html
 
   const extname = String(path.extname(filePath)).toLowerCase();
@@ -29,8 +29,16 @@ const server = http.createServer((req, res) => {
 
   fs.readFile(path.join(__dirname, filePath), (err, content) => {
     if (err) {
-      res.writeHead(404);
-      res.end('Sorry, we couldn\'t find that!');
+      fs.readFile(path.join(__dirname, 'public', '404.html'), (err404, content404) => {
+        if (err404) {
+          // Fallback if 404.html is not found
+          res.writeHead(404, { 'Content-Type': 'text/html' });
+          res.end('<h1>404 Not Found</h1><p>The page you are looking for does not exist.</p>');
+        } else {
+          res.writeHead(404, { 'Content-Type': 'text/html' });
+          res.end(content404);
+        }
+      });
     } else {
       res.writeHead(200, { 'Content-Type': contentType });
       res.end(content);
