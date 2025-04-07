@@ -138,7 +138,16 @@ function showBookmarks(container) {
   bookmarks.forEach(bookmark => {
     const bookmarkItem = createBookmarkListItem(
       bookmark,
-      () => navigateToBookmark(bookmark.lat, bookmark.lng),
+      async () => {
+        // Show loading indicator
+        container.innerHTML = `<li style="justify-content: center;"><i class="fas fa-circle-notch fa-spin"></i></li>`;
+        
+        // Navigate to the bookmark (this will also show place details)
+        await navigateToBookmark(bookmark.lat, bookmark.lng);
+        
+        // Close the results container
+        removeResults();
+      },
       () => {
         removeBookmark(bookmark.lat, bookmark.lng);
         showBookmarks(container); // Refresh the list

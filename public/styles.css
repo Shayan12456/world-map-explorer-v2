@@ -599,6 +599,10 @@ footer {
   color: #e74c3c;
 }
 
+.bookmark-actions .share-btn:hover {
+  color: #3498db;
+}
+
 .result-content {
   flex: 1;
   overflow: hidden;

@@ -59,4 +59,24 @@ function calculateHeight() {
 
 L.control.scale().addTo(map); // this adds the visible scale to the map
 
+// Initialize map view
+map.setView([20, 0], 2);
+
+// Check for URL parameters on load
+const urlParams = new URLSearchParams(window.location.search);
+const lat = urlParams.get('lat');
+const lng = urlParams.get('lng');
+const zoom = urlParams.get('zoom');
+const fromName = urlParams.get('from'); // Check for the new name-based route param
+
+// Only set view from lat/lng/zoom if route params are NOT present
+if (lat && lng && zoom && !fromName) {
+    const initialLat = parseFloat(lat);
+    const initialLng = parseFloat(lng);
+    const initialZoom = parseInt(zoom);
+    if (!isNaN(initialLat) && !isNaN(initialLng) && !isNaN(initialZoom)) {
+        map.setView([initialLat, initialLng], initialZoom);
+    }
+}
+
 
