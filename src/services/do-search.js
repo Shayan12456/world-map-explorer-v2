@@ -8,6 +8,7 @@ import { keyboardselect } from "../utils/keydown-helpers.js";
 import { successSound } from "../utils/sounds.js";
 import { geocodingAPI, headerofNominatim } from "../utils/to-km-or-meter.js";
 import { getSearchHistory, addToSearchHistory, createHistoryListItem } from "./search-history.js";
+import { getBookmarks, addBookmark, removeBookmark, navigateToBookmark, createBookmarkListItem } from "./bookmarks.js";
 
 var placeIds = [];
 
@@ -17,6 +18,20 @@ let searchLoadingInterval; // To store the interval globally for cancellation
 export function initializeSearchInput() {
   const searchInput = document.getElementById('search-input');
   if (searchInput) {
+    // Add bookmarks button
+    const bookmarksBtn = document.createElement('button');
+    bookmarksBtn.id = 'bookmarks-btn';
+    bookmarksBtn.className = 'action-btn';
+    bookmarksBtn.innerHTML = '<i class="fas fa-bookmark"></i> Bookmarks';
+    bookmarksBtn.setAttribute('aria-label', 'Show bookmarks');
+    searchInput.parentElement.parentNode.insertBefore(bookmarksBtn, searchInput.parentElement.nextSibling);
+
+    // Add event listeners
+    bookmarksBtn.addEventListener('click', () => {
+      const container = initializeResultsContainer(searchInput);
+      showBookmarks(container);
+    });
+
     searchInput.addEventListener('focus', () => {
       const query = searchInput.value.trim();
       if (query.length <= 2) {
@@ -102,6 +117,37 @@ function showSearchHistory(container, inputField, resolve) {
   });
 }
 
+// Show bookmarks in the results container
+function showBookmarks(container) {
+  const bookmarks = getBookmarks();
+  container.innerHTML = "";
+
+  if (bookmarks.length === 0) {
+    addNoResultsMessage(container, "No bookmarks saved");
+    return;
+  }
+
+  // Add header
+  const headerItem = document.createElement("li");
+  headerItem.innerHTML = `<span style="color: #666; font-weight: bold;">Saved Places</span>`;
+  headerItem.style.backgroundColor = "transparent";
+  headerItem.style.cursor = "default";
+  container.appendChild(headerItem);
+
+  // Add bookmarks
+  bookmarks.forEach(bookmark => {
+    const bookmarkItem = createBookmarkListItem(
+      bookmark,
+      () => navigateToBookmark(bookmark.lat, bookmark.lng),
+      () => {
+        removeBookmark(bookmark.lat, bookmark.lng);
+        showBookmarks(container); // Refresh the list
+      }
+    );
+    container.appendChild(bookmarkItem);
+  });
+}
+
 // Clears the search results and associated event listeners
 function clearSearchResults(searchResults) {
   if (searchResults) {
@@ -169,9 +215,9 @@ function renderSearchResults(data, container, inputField, resolve) {
 }
 
 // Adds a "No Results Found" message
-function addNoResultsMessage(container) {
+function addNoResultsMessage(container, message = "No results found") {
   const noResultsItem = document.createElement("li");
-  noResultsItem.textContent = "No results found";
+  noResultsItem.textContent = message;
   container.appendChild(noResultsItem);
 }
 
@@ -192,9 +238,37 @@ function addMoreResultsOption(container, inputField, placeIds, resolve) {
 // Creates a search result list item
 function createResultListItem(result, onClick) {
   const listItem = document.createElement("li");
+  
+  // Create bookmark button
+  const bookmarkBtn = document.createElement("button");
+  bookmarkBtn.className = "bookmark-btn";
+  bookmarkBtn.innerHTML = '<i class="far fa-star"></i>';
+  bookmarkBtn.setAttribute("aria-label", `Bookmark ${result.display_name}`);
+  
+  // Add bookmark functionality
+  bookmarkBtn.addEventListener("click", (e) => {
+    e.stopPropagation(); // Prevent triggering the list item click
+    const success = addBookmark(result.display_name, parseFloat(result.lat), parseFloat(result.lon));
+    if (success) {
+      bookmarkBtn.innerHTML = '<i class="fas fa-star"></i>';
+      bookmarkBtn.classList.add("active");
+    }
+  });
+
+  // Check if already bookmarked
+  const bookmarks = getBookmarks();
+  if (bookmarks.some(b => b.lat === parseFloat(result.lat) && b.lng === parseFloat(result.lon))) {
+    bookmarkBtn.innerHTML = '<i class="fas fa-star"></i>';
+    bookmarkBtn.classList.add("active");
+  }
+
   listItem.innerHTML = `
-    <span style="color: grey; display: flex;">${result.type}&nbsp</span>
-    ${result.display_name}`;
+    <div class="result-content">
+      <span style="color: grey; display: flex;">${result.type}&nbsp</span>
+      ${result.display_name}
+    </div>`;
+  
+  listItem.insertBefore(bookmarkBtn, listItem.firstChild);
   listItem.setAttribute("aria-label", result.display_name);
   listItem.tabIndex = 1;
   listItem.addEventListener("click", onClick);
