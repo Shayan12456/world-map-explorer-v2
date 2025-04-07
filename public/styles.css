@@ -274,12 +274,23 @@ header button{
     margin: 3.5px;
     background-color: #efeaea;
     border-radius: 3px;
-    padding: 2px;
+    padding: 8px;
     font-size: 13px;
     display: flex;
-    
+    align-items: center;
   }
-  #search-results li:hover{
+  #search-results li:first-child {
+    background-color: transparent;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 8px;
+    padding: 8px;
+  }
+  #search-results li .fa-history {
+    color: #666;
+    margin-right: 8px;
+    font-size: 14px;
+  }
+  #search-results li:hover:not(:first-child) {
     background-color: rgb(223, 242, 236);
   }
   

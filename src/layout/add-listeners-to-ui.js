@@ -12,6 +12,7 @@ import { fetchCurrentLocation } from '../services/current-location.js';
 import { closeSearchResultsOnClickOutside } from '../utils/general-events.js';
 import { closeSound } from '../utils/sounds.js';
 import { map } from '../components/map.js';
+import { initializeSearchInput } from '../services/do-search.js';
 
 
 
@@ -34,6 +35,8 @@ let minusIcon = document
 
 
 export function addListenerstoUI(){
+  // Initialize search input event listeners
+  initializeSearchInput();
   
 layersBtn.addEventListener('click', function () {
   layersDropdown.style.display =

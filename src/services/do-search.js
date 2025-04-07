@@ -7,11 +7,31 @@ import { notifyLoading, notifySreenReader } from "../utils/accessibility.js";
 import { keyboardselect } from "../utils/keydown-helpers.js";
 import { successSound } from "../utils/sounds.js";
 import { geocodingAPI, headerofNominatim } from "../utils/to-km-or-meter.js";
+import { getSearchHistory, addToSearchHistory, createHistoryListItem } from "./search-history.js";
 
 var placeIds = [];
 
 let searchLoadingInterval; // To store the interval globally for cancellation
 
+// Initialize search input event listeners
+export function initializeSearchInput() {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('focus', () => {
+      const query = searchInput.value.trim();
+      if (query.length <= 2) {
+        showSearchHistory(initializeResultsContainer(searchInput), searchInput);
+      }
+    });
+
+    searchInput.addEventListener('input', () => {
+      const query = searchInput.value.trim();
+      if (query.length <= 2) {
+        showSearchHistory(initializeResultsContainer(searchInput), searchInput);
+      }
+    });
+  }
+}
 
 export function performSearch(inputField, excludedPlaceIds = []) {
   removeResults(); // Clear the previous search results
@@ -20,14 +40,14 @@ export function performSearch(inputField, excludedPlaceIds = []) {
     const query = inputField.value.trim();
     const loadingMessage = `<li style="justify-content: center;"><i class="fas fa-circle-notch fa-spin"></i></li>`;
 
-    // Clear results if query length is insufficient
-    if (query.length <= 2) {
-      removeResults();
-      return;
-    }
-
     // Initialize the search results container
     let resultsContainer = initializeResultsContainer(inputField);
+
+    // If query is empty or too short, show search history
+    if (query.length <= 2) {
+      showSearchHistory(resultsContainer, inputField, resolve);
+      return;
+    }
 
     // Display loading indicator
     resultsContainer.innerHTML = loadingMessage;
@@ -40,12 +60,45 @@ export function performSearch(inputField, excludedPlaceIds = []) {
       .then((data) => {
         clearInterval(searchLoadingInterval);
         renderSearchResults(data, resultsContainer, inputField, resolve);
+        if (data.length > 0) {
+          addToSearchHistory(query); // Add to history if results were found
+        }
       })
       .catch((error) => {
         clearInterval(searchLoadingInterval);
         console.error("Error fetching search results:", error);
         reject(error);
       });
+  });
+}
+
+// Show search history in the results container
+function showSearchHistory(container, inputField, resolve) {
+  const history = getSearchHistory();
+  container.innerHTML = "";
+
+  if (history.length === 0) {
+    addNoResultsMessage(container);
+    return;
+  }
+
+  // Add a header for search history
+  const headerItem = document.createElement("li");
+  headerItem.innerHTML = `<span style="color: #666; font-weight: bold;">Recent Searches</span>`;
+  headerItem.style.backgroundColor = "transparent";
+  headerItem.style.cursor = "default";
+  container.appendChild(headerItem);
+
+  history.forEach(query => {
+    const historyItem = createHistoryListItem(query, (selectedQuery) => {
+      inputField.value = selectedQuery;
+      if (resolve) {
+        performSearch(inputField, []).then(resolve);
+      } else {
+        performSearch(inputField, []);
+      }
+    });
+    container.appendChild(historyItem);
   });
 }
 
@@ -59,17 +112,23 @@ function clearSearchResults(searchResults) {
 
 // Initializes the search results container
 function initializeResultsContainer(inputField) {
-  let container = inputField.nextElementSibling;
-  if (!container || container.tagName !== "UL") {
-    container = document.createElement("ul");
-    container.id = "search-results";
-    container.tabIndex = 7;
-    container.setAttribute("aria-label", "Select your result");
-    inputField.parentElement.parentNode.insertBefore(
-      container,
-      inputField.parentNode.nextSibling
-    );
-  }
+  // First, remove any existing search results containers
+  const existingContainers = document.querySelectorAll('#search-results');
+  existingContainers.forEach(container => {
+    container.parentElement?.removeEventListener("keydown", keyboardselect);
+    container.remove();
+  });
+
+  // Create new container
+  const container = document.createElement("ul");
+  container.id = "search-results";
+  container.tabIndex = 7;
+  container.setAttribute("aria-label", "Select your result");
+  inputField.parentElement.parentNode.insertBefore(
+    container,
+    inputField.parentNode.nextSibling
+  );
+  
   container.parentElement.addEventListener("keydown", keyboardselect);
   return container;
 }
